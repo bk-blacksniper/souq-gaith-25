@@ -1,0 +1,134 @@
+.section-product {
+    background-color: #FAFBFC;
+}
+
+/* شريط البحث */
+.search-input {
+  padding: 8px 35px 8px 10px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 16px;
+}
+
+/* تصميم البطاقة */
+.product-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.card-top {
+  background-color: #fff;
+  padding: 20px;
+}
+
+.card-bottom {
+  background-color: #eaf8f4;
+  padding: 15px;
+}
+
+.product-icon {
+  font-size: 60px;
+}
+
+.all-cards {
+  display: grid;
+    grid-template-columns: auto auto auto auto;
+    gap: 20px;
+}
+
+
+/* -------- Start Swiper Slide -------- */
+/* الحاوية الرئيسية للسلايدر */
+.swiper-container {
+  position: relative; /* لضمان أن الأزرار تظل داخل الحاوية */
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* حاوية الأزرار */
+.slider-controls {
+  position: absolute; /* لتحديد موقع الأزرار داخل الحاوية */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* مسافة بين الأسهم */
+  bottom: 20px;
+}
+
+/* تصميم الأزرار */
+.custom-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  color: black;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* الأزرار عند التعطيل */
+.custom-arrow.swiper-button-disabled {
+  color: rgba(82, 179, 156, 0.28);
+  border-color: rgba(82, 179, 156, 0.28);
+  cursor: not-allowed;
+}
+
+/* إزالة النص الافتراضي لأزرار Swiper */
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  display: none;
+}
+
+.slider-controls button {
+    font-size: 32px;
+}
+/* -------- End Swiper Slide -------- */
+
+.search-bar {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.position-relative {
+  width: -webkit-fill-available;
+}
+
+.btn-success {
+  background-color: #219d80 !important;
+  border: none !important;
+}
+
+.btn-search {
+  width: 220px;
+}
+
+@media only screen and (max-width: 600px) {
+  .search-bar {
+    flex-wrap: wrap;
+  }
+  .btn-search {
+    width: 100%;
+  }
+}
+
+.product-card .text-muted {
+  display: flex;
+  justify-content: space-between;
+}
+
+.product-card .btn {
+  width: 90%;
+}

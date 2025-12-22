@@ -1,0 +1,15 @@
+{
+  "nav.home": "Home",
+  "nav.market": "Market",
+  "nav.donate": "Donate",
+  "auth.login": "Login",
+  "auth.register": "Register",
+  "form.title": "Title",
+  "form.description": "Description",
+  "form.category": "Category",
+  "form.type.sell": "Sell",
+  "form.type.donate": "Donate",
+  "form.submit": "Submit",
+  "msg.loading": "Loading...",
+  "msg.noData": "No data"
+}

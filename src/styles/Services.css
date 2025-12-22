@@ -1,0 +1,51 @@
+/* Styling for the Services Section */
+.services-section {
+    background-color: url('../assets/images/_Path_.svg');
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #343a40;
+  }
+  
+  .section-description {
+    font-size: 1rem;
+    color: #6c757d;
+  }
+  
+  .service-card {
+    border-radius: 12px;
+    background-color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    align-items: center;
+  }
+  
+  .service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  .service-icon {
+    background: rgba(82, 179, 156, 0.28);
+    padding: 10px;
+    border-radius: 10px;
+    margin: 0 auto;
+  }
+  .service-icon img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .service-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #343a40;
+  }
+  
+  .service-description {
+    font-size: 0.95rem;
+    color: #6c757d;
+  }
+  .service-card .btn {
+    width: 150px;
+  }

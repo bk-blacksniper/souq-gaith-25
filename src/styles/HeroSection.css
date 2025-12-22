@@ -1,0 +1,30 @@
+/* Start Hero Section  */
+.hero-section {
+  position: relative;
+  background-image: url("../assets/images/hero-section.png");
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}
+
+.hero-section.two {
+  background-image: none;
+  background-color: #302D3D !important;
+  height: 60vh;
+}
+
+.hero-section .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* لتعتيم الخلفية */
+  z-index: 1;
+}
+
+.hero-section .container {
+  position: relative;
+  z-index: 2;
+}
+/* End Hero Section  */

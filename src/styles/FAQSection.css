@@ -1,0 +1,101 @@
+/* الحاوية الرئيسية */
+.faq-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 20px;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+
+/* الصورة */
+.faq-image {
+  flex: 1;
+  max-width: 40%;
+}
+
+.faq-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* المحتوى */
+.faq-content {
+  flex: 1;
+  max-width: 55%;
+}
+
+.faq-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.faq-description {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #302d3d;
+}
+
+/* الأسئلة */
+.faq-item {
+  border-bottom: 1px solid #302d3d;
+}
+
+.faq-question {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  text-align: right;
+  padding: 10px 0;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #302d3d;
+}
+
+.faq-item .faq-question.active {
+  background: #cfeae3;
+  padding: 10px;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  margin-top: 10px;
+}
+
+.faq-question.active + .faq-answer {
+  background-color: #cfeae3;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #80808F;
+}
+
+.faq-icon {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 992px) {
+  .faq-container {
+    flex-direction: column;
+    flex-direction: column-reverse;
+  }
+
+  .faq-image,
+  .faq-content {
+    max-width: 100%;
+  }
+
+  .faq-image {
+    margin-bottom: 20px;
+  }
+}

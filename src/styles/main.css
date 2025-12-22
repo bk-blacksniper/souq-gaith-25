@@ -1,0 +1,9 @@
+/* Navbar */
+.nav-link {
+    transition: color 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    color: #000 !important;
+  }
+  

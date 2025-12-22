@@ -1,0 +1,74 @@
+/* الحاوية الرئيسية */
+.about-us {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 20px;
+}
+
+/* النصوص */
+.about-content {
+  flex: 1;
+  max-width: 50%;
+  text-align: right;
+}
+
+.about-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.about-text {
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 15px;
+  color: #5D5D6A;
+}
+
+.about-list {
+  list-style-type: disc;
+  padding-right: 20px;
+}
+
+.about-button {
+  background-color: #219D80;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 36px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* الصورة */
+.about-image {
+  flex: 1;
+  max-width: 50%;
+}
+
+.about-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 992px) {
+  .about-us {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .about-content,
+  .about-image {
+    max-width: 100%;
+  }
+
+  .about-button {
+    display: inline-block;
+    margin-top: 10px;
+  }
+}

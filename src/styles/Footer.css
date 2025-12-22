@@ -1,0 +1,81 @@
+/* الفوتر الرئيسي */
+.footer {
+  background-color: #2c2a3f; /* الخلفية الداكنة */
+  color: #fff; /* لون النص */
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* اسم الموقع */
+.footer-title {
+  color: #00b894; /* اللون الأخضر */
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* روابط الفوتر */
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-links li a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.footer-links li a:hover {
+  color: #00b894; /* اللون الأخضر عند التحويل */
+}
+
+/* أيقونات التواصل الاجتماعي */
+.footer-social {
+  display: flex;
+  gap: 15px;
+  margin: 10px 0;
+}
+
+.footer-social a {
+  color: #00b894; /* لون الأيقونات */
+  font-size: 20px;
+  transition: color 0.3s;
+}
+
+.footer-social a:hover {
+  color: #ffffff; /* تغيير لون الأيقونة عند التحويل */
+}
+
+/* خط الحقوق */
+.footer-bottom {
+  border-top: 1px solid #666; /* خط فاصل */
+  margin-top: 20px;
+  padding-top: 10px;
+  font-size: 14px;
+  color: #bbb;
+}
+
+/* التصميم المتجاوب */
+@media (max-width: 768px) {
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-social {
+    gap: 10px;
+  }
+}

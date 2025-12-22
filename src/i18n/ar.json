@@ -1,0 +1,15 @@
+{
+  "nav.home": "الرئيسية",
+  "nav.market": "السوق",
+  "nav.donate": "تبرع",
+  "auth.login": "تسجيل الدخول",
+  "auth.register": "إنشاء حساب",
+  "form.title": "العنوان",
+  "form.description": "الوصف",
+  "form.category": "التصنيف",
+  "form.type.sell": "بيع",
+  "form.type.donate": "تبرع",
+  "form.submit": "إرسال",
+  "msg.loading": "جارِ التحميل...",
+  "msg.noData": "لا توجد بيانات"
+}
