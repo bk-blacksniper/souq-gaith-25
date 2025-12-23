@@ -5,7 +5,7 @@ import HeroSection from "./components/HeroSection";
 import HeroSection2 from "./components/HeroSectionTwo";
 import Services from "./components/Services";
 import Services2 from "./components/Services2";
-import Products from "./components/Products";
+import Products from "./pages/Products";
 import Products2 from "./components/Products2";
 import AboutUs from "./components/AboutUs";
 import FAQSection from "./components/FAQSection";

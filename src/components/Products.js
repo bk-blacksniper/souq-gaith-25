@@ -55,7 +55,6 @@ export default function Products() {
     return <p className="text-center p-4">لا يوجد منتجات حاليًا.</p>;
   }
 
-  // ✅ عرض المنتجات مباشرة بدون Products2
   return (
     <div className="products-wrapper container" style={{ padding: "1rem" }}>
       <div
