@@ -1,6 +1,6 @@
 // src/components/Products.js
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient"; // انتبه للمسار
+import { supabase } from "../lib/supabaseClient";
 
 export default function Products() {
   const [products, setProducts] = useState([]);

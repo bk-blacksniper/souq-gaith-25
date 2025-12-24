@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/AboutUs.css";
-import aboutImage from "../assets/images/about-image.png"; // تأكد من وضع مسار الصورة الصحيح
+import aboutImage from "../assets/images/about-image.png";
 
 const AboutUs = () => {
   return (

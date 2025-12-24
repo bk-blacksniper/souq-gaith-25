@@ -1,7 +1,4 @@
-// Services.js
-
-import ServicesSection from './Services2';   // أو './service2'
-import Products from './Products';           // عدّل المسار حسب مكان Products.js
+import ServicesSection from './Services2';
 
 const Services = () => {
   return (
@@ -13,7 +10,6 @@ const Services = () => {
       <section className="py-5">
         <div className="container">
           <h2 className="mb-4 text-center">منتجاتنا</h2>
-          {/* <Products /> */}
         </div>
       </section>
     </main>

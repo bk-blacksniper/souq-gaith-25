@@ -14,8 +14,12 @@ import ContactUs from "./components/ContactUs";
 import Exchange from "./components/Exchange";
 import Sale from "./components/Sale";
 import Donate from "./components/Donate";
+import MyRequests from "./pages/MyRequests";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
+  const openLogin = () => window.dispatchEvent(new Event("open-login"));
+
   return (
     <Router>
       <Navbar />
@@ -33,6 +37,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/services"
           element={
@@ -48,12 +53,27 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/products"
           element={
             <>
               <HeroSection2 heroName="منتجاتنا" heroBody="بيب" />
-              <Products /> <Footer />
+              <Products />
+              <Footer />
+            </>
+          }
+        />
+
+        <Route
+          path="/my-requests"
+          element={
+            <>
+              <HeroSection2 heroName="طلباتي" />
+              <ProtectedRoute openLogin={openLogin}>
+                <MyRequests />
+              </ProtectedRoute>
+              <Footer />
             </>
           }
         />
@@ -72,6 +92,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/faq"
           element={
@@ -85,6 +106,7 @@ function App() {
             </>
           }
         />
+
         <Route
           path="/contact"
           element={
@@ -107,11 +129,14 @@ function App() {
                 heroName="تبادل منتج"
                 heroBody="هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما سيلهي القارئ عن التركيز على الشكل الخارجي للنص"
               />
-              <Exchange />
+              <ProtectedRoute openLogin={openLogin}>
+                <Exchange />
+              </ProtectedRoute>
               <Footer />
             </>
           }
         />
+
         <Route
           path="/sale"
           element={
@@ -120,11 +145,14 @@ function App() {
                 heroName="بيع منتج"
                 heroBody="هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما سيلهي القارئ عن التركيز على الشكل الخارجي للنص"
               />
-              <Sale />
+              <ProtectedRoute openLogin={openLogin}>
+                <Sale />
+              </ProtectedRoute>
               <Footer />
             </>
           }
         />
+
         <Route
           path="/donate"
           element={
@@ -133,7 +161,9 @@ function App() {
                 heroName="تبرع بمنتج"
                 heroBody="هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما سيلهي القارئ عن التركيز على الشكل الخارجي للنص"
               />
-              <Donate />
+              <ProtectedRoute openLogin={openLogin}>
+                <Donate />
+              </ProtectedRoute>
               <Footer />
             </>
           }

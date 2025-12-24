@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import "../styles/FileUploader.css";
 import Image from "../assets/icon/Image.png";
-import { supabase } from "../lib/supabaseClient"; // ✅ تأكد المسار صحيح
+import { supabase } from "../lib/supabaseClient";
 
 function FileUploader({ onUpload }) {
   const [files, setFiles] = useState(null);
@@ -28,7 +28,6 @@ function FileUploader({ onUpload }) {
         return;
       }
 
-      // ✅ تأكد المستخدم مسجل دخول (لأن الرفع غالبًا للـ authenticated)
       const { data: uData, error: uErr } = await supabase.auth.getUser();
       if (uErr) throw uErr;
       if (!uData?.user) {
@@ -46,7 +45,7 @@ function FileUploader({ onUpload }) {
           .slice(2)}.${ext}`;
 
         const { error: upErr } = await supabase.storage
-          .from("product-images") // ✅ اسم البكت
+          .from("product-images")
           .upload(filePath, file, { upsert: false });
 
         if (upErr) throw upErr;

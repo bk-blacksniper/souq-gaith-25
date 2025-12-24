@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
 import LoginAlert from "./LoginAlert";
@@ -10,22 +10,28 @@ const Navbar = () => {
 
   const [showAlert, setShowAlert] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
 
+  const toggleAlert = () => setShowAlert(!showAlert);
   const switchToSignUp = () => setIsSignUp(true);
   const switchToLogin = () => setIsSignUp(false);
 
-  const toggleAlert = () => {
-    setShowAlert(!showAlert);
-  };
-
-  // link active
   const isActive = (path) =>
     location.pathname === path ? "text-dark fw-bold" : "text-white";
 
-  // جلب المستخدم + اسمه
+  // ✅ استقبل طلب فتح نافذة تسجيل الدخول من ProtectedRoute
+  useEffect(() => {
+    const openLoginHandler = () => {
+      setIsSignUp(false);
+      setShowAlert(true);
+    };
+
+    window.addEventListener("open-login", openLoginHandler);
+    return () => window.removeEventListener("open-login", openLoginHandler);
+  }, []);
+
+  // تحميل المستخدم
   useEffect(() => {
     const loadUser = async () => {
       const { data } = await supabase.auth.getUser();
@@ -38,7 +44,6 @@ const Navbar = () => {
           .select("full_name")
           .eq("id", u.id)
           .single();
-
         setProfile(profileData);
       } else {
         setProfile(null);
@@ -51,12 +56,9 @@ const Navbar = () => {
       loadUser();
     });
 
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+    return () => listener.subscription.unsubscribe();
   }, []);
 
-  // تسجيل خروج
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -64,7 +66,7 @@ const Navbar = () => {
   };
 
   return (
-    <div>
+    <>
       <nav className="navbar navbar-expand-lg navbar-light fixed-top custom-navbar">
         <div className="container">
           {/* Logo */}
@@ -82,27 +84,22 @@ const Navbar = () => {
             <span className="navbar-toggler-icon"></span>
           </button>
 
-          {/* Links */}
+          {/* Menu */}
           <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav mx-auto">
+            {/* Links */}
+            <ul className="navbar-nav mx-auto text-center">
               <li className="nav-item">
                 <Link className={`nav-link ${isActive("/")}`} to="/">
                   الرئيسية
                 </Link>
               </li>
               <li className="nav-item">
-                <Link
-                  className={`nav-link ${isActive("/services")}`}
-                  to="/services"
-                >
+                <Link className={`nav-link ${isActive("/services")}`} to="/services">
                   خدماتنا
                 </Link>
               </li>
               <li className="nav-item">
-                <Link
-                  className={`nav-link ${isActive("/products")}`}
-                  to="/products"
-                >
+                <Link className={`nav-link ${isActive("/products")}`} to="/products">
                   منتجاتنا
                 </Link>
               </li>
@@ -117,24 +114,22 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link
-                  className={`nav-link ${isActive("/contact")}`}
-                  to="/contact"
-                >
+                <Link className={`nav-link ${isActive("/contact")}`} to="/contact">
                   تواصل معنا
                 </Link>
               </li>
             </ul>
 
-            {/* Right buttons */}
-            <div className="d-flex align-items-center gap-2">
+            {/* User Menu */}
+            <div className="d-flex justify-content-center mt-3 mt-lg-0">
               {!user ? (
-                <>
-                  <button className="btn btn-success" onClick={toggleAlert}>
+                <div className="d-flex flex-column flex-lg-row gap-2 w-100">
+                  <button className="btn btn-success w-100" onClick={toggleAlert}>
                     تسجيل الدخول
                   </button>
+
                   <button
-                    className="create-account btn"
+                    className="create-account btn w-100"
                     onClick={() => {
                       setIsSignUp(true);
                       setShowAlert(true);
@@ -142,19 +137,46 @@ const Navbar = () => {
                   >
                     إنشاء حساب
                   </button>
-                </>
+                </div>
               ) : (
-                <>
-                  <span className="text-white fw-bold">
-                    أهلاً، {profile?.full_name || "مستخدم"}
-                  </span>
+                <div className="dropdown text-center w-100">
                   <button
-                    className="btn btn-outline-light"
-                    onClick={handleLogout}
+                    className="btn btn-outline-light dropdown-toggle w-100"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
                   >
-                    تسجيل خروج
+                    <i className="bi bi-person-circle me-2"></i>
+                    {profile?.full_name || "حسابي"}
                   </button>
-                </>
+
+                  <ul className="dropdown-menu dropdown-menu-end text-end w-100">
+                    <li>
+                      <Link className="dropdown-item" to="/my-requests">
+                        <i className="bi bi-box-seam me-2"></i>
+                        طلباتي
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link className="dropdown-item" to="/settings">
+                        <i className="bi bi-gear me-2"></i>
+                        الإعدادات
+                      </Link>
+                    </li>
+
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+
+                    <li>
+                      <button className="dropdown-item text-danger" onClick={handleLogout}>
+                        <i className="bi bi-box-arrow-right me-2"></i>
+                        تسجيل الخروج
+                      </button>
+                    </li>
+                  </ul>
+                </div>
               )}
             </div>
           </div>
@@ -166,12 +188,9 @@ const Navbar = () => {
         (isSignUp ? (
           <SignUp toggleAlert={toggleAlert} switchToLogin={switchToLogin} />
         ) : (
-          <LoginAlert
-            toggleAlert={toggleAlert}
-            switchToSignUp={switchToSignUp}
-          />
+          <LoginAlert toggleAlert={toggleAlert} switchToSignUp={switchToSignUp} />
         ))}
-    </div>
+    </>
   );
 };
 
