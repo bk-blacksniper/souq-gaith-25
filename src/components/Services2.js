@@ -1,28 +1,32 @@
 // Services2.js أو service2.js
 
-import React from 'react';
-import '../styles/Services.css';
-import Arrow from '../assets/icon/Arrow.svg'
-import Money from '../assets/icon/money.svg'
-import Heart from '../assets/icon/Heart Donation.svg'
+import React from "react";
+import "../styles/Services.css";
+import Arrow from "../assets/icon/Arrow.svg";
+import Money from "../assets/icon/money.svg";
+import Heart from "../assets/icon/Heart Donation.svg";
+import { Link } from "react-router-dom";
 
 const services = [
   {
-    title: 'تبادل المنتجات',
-    description: 'هنا يمكنك مبادلة ما لديك بما تحتاجه مما يتيح لك تحقيق أقصى استفادة بدون تكلفة مالية.',
-    button: 'بدل الآن',
+    title: "تبادل المنتجات",
+    description:
+      "هنا يمكنك مبادلة ما لديك بما تحتاجه مما يتيح لك تحقيق أقصى استفادة بدون تكلفة مالية.",
+    button: "بدل الآن",
     icon: Arrow,
   },
   {
-    title: 'بيع منتجات',
-    description: 'استفد مما لديك عبر بيعه لمن يحتاج إليه، مع المساهمة في تلبية احتياجات الآخرين.',
-    button: 'بيع الآن',
+    title: "بيع منتجات",
+    description:
+      "استفد مما لديك عبر بيعه لمن يحتاج إليه، مع المساهمة في تلبية احتياجات الآخرين.",
+    button: "بيع الآن",
     icon: Money,
   },
   {
-    title: 'تبرع',
-    description: 'قدّم ما لا تحتاجه للآخرين وساهم في دعم مجتمعك وإحداث فرق إيجابي في حياة الناس.',
-    button: 'تبرع الآن',
+    title: "تبرع",
+    description:
+      "قدّم ما لا تحتاجه للآخرين وساهم في دعم مجتمعك وإحداث فرق إيجابي في حياة الناس.",
+    button: "تبرع الآن",
     icon: Heart,
   },
 ];
@@ -39,8 +43,21 @@ const ServicesSection = () => {
                   <img src={service.icon} alt={`${service.title} icon`} />
                 </div>
                 <h5 className="service-title mb-3">{service.title}</h5>
-                <p className="service-description mb-4">{service.description}</p>
-                <button className="btn btn-success">{service.button}</button>
+                <p className="service-description mb-4">
+                  {service.description}
+                </p>
+                <Link
+                  className="btn btn-success"
+                  to={
+                    service.title === "تبادل المنتجات"
+                      ? "/exchange"
+                      : service.title === "بيع منتجات"
+                      ? "/sale"
+                      : "/donate"
+                  }
+                >
+                  {service.button}
+                </Link>
               </div>
             </div>
           ))}

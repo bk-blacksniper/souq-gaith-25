@@ -41,7 +41,7 @@ const Navbar = () => {
       if (u) {
         const { data: profileData } = await supabase
           .from("profiles")
-          .select("full_name")
+          .select("full_name, avatar_url")
           .eq("id", u.id)
           .single();
         setProfile(profileData);
@@ -94,12 +94,18 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${isActive("/services")}`} to="/services">
+                <Link
+                  className={`nav-link ${isActive("/services")}`}
+                  to="/services"
+                >
                   خدماتنا
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${isActive("/products")}`} to="/products">
+                <Link
+                  className={`nav-link ${isActive("/products")}`}
+                  to="/products"
+                >
                   منتجاتنا
                 </Link>
               </li>
@@ -114,7 +120,10 @@ const Navbar = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${isActive("/contact")}`} to="/contact">
+                <Link
+                  className={`nav-link ${isActive("/contact")}`}
+                  to="/contact"
+                >
                   تواصل معنا
                 </Link>
               </li>
@@ -124,7 +133,10 @@ const Navbar = () => {
             <div className="d-flex justify-content-center mt-3 mt-lg-0">
               {!user ? (
                 <div className="d-flex flex-column flex-lg-row gap-2 w-100">
-                  <button className="btn btn-success w-100" onClick={toggleAlert}>
+                  <button
+                    className="btn btn-success w-100"
+                    onClick={toggleAlert}
+                  >
                     تسجيل الدخول
                   </button>
 
@@ -141,13 +153,26 @@ const Navbar = () => {
               ) : (
                 <div className="dropdown text-center w-100">
                   <button
-                    className="btn btn-outline-light dropdown-toggle w-100"
+                    className="btn btn-outline-light dropdown-toggle w-100 d-flex align-items-center justify-content-center gap-2"
                     type="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <i className="bi bi-person-circle me-2"></i>
-                    {profile?.full_name || "حسابي"}
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt="avatar"
+                        style={{
+                          width: 26,
+                          height: 26,
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <i className="bi bi-person-circle"></i>
+                    )}
+                    <span>{profile?.full_name || "حسابي"}</span>
                   </button>
 
                   <ul className="dropdown-menu dropdown-menu-end text-end w-100">
@@ -170,7 +195,10 @@ const Navbar = () => {
                     </li>
 
                     <li>
-                      <button className="dropdown-item text-danger" onClick={handleLogout}>
+                      <button
+                        className="dropdown-item text-danger"
+                        onClick={handleLogout}
+                      >
                         <i className="bi bi-box-arrow-right me-2"></i>
                         تسجيل الخروج
                       </button>
@@ -188,7 +216,10 @@ const Navbar = () => {
         (isSignUp ? (
           <SignUp toggleAlert={toggleAlert} switchToLogin={switchToLogin} />
         ) : (
-          <LoginAlert toggleAlert={toggleAlert} switchToSignUp={switchToSignUp} />
+          <LoginAlert
+            toggleAlert={toggleAlert}
+            switchToSignUp={switchToSignUp}
+          />
         ))}
     </>
   );

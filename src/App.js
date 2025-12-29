@@ -4,9 +4,7 @@ import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import HeroSection2 from "./components/HeroSectionTwo";
 import Services from "./components/Services";
-import Services2 from "./components/Services2";
 import Products from "./pages/Products";
-import Products2 from "./components/Products2";
 import AboutUs from "./components/AboutUs";
 import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
@@ -16,6 +14,8 @@ import Sale from "./components/Sale";
 import Donate from "./components/Donate";
 import MyRequests from "./pages/MyRequests";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Settings from "./pages/Settings";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const openLogin = () => window.dispatchEvent(new Event("open-login"));
@@ -24,13 +24,16 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
+        {/* Home */}
         <Route
           path="/"
           element={
             <>
               <HeroSection />
               <Services />
-              <Products />
+
+              {/* <Products mode="home" homeLimit={3} showPagination={false} /> */}
+
               <AboutUs />
               <FAQSection />
               <Footer />
@@ -38,6 +41,7 @@ function App() {
           }
         />
 
+        {/* Services */}
         <Route
           path="/services"
           element={
@@ -46,25 +50,27 @@ function App() {
                 heroName="خدماتنا"
                 heroBody="هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما سيلهي القارئ عن التركيز على الشكل الخارجي للنص"
               />
-              <Services2 />
-              <Products2 />
+              {/* ✅ Services لحالها (بدون Services2 ولا Products) عشان ما يتكرر */}
+              <Services />
               <FAQSection />
               <Footer />
             </>
           }
         />
 
+        {/* Products */}
         <Route
           path="/products"
           element={
             <>
               <HeroSection2 heroName="منتجاتنا" heroBody="بيب" />
-              <Products />
+              <Products mode="all" />
               <Footer />
             </>
           }
         />
 
+        {/* My Requests - Protected */}
         <Route
           path="/my-requests"
           element={
@@ -78,6 +84,18 @@ function App() {
           }
         />
 
+        {/* Settings */}
+        <Route
+          path="/settings"
+          element={
+            <>
+              <HeroSection2 heroName="الإعدادات" />
+              <Settings />
+            </>
+          }
+        />
+
+        {/* About */}
         <Route
           path="/about"
           element={
@@ -93,6 +111,7 @@ function App() {
           }
         />
 
+        {/* FAQ */}
         <Route
           path="/faq"
           element={
@@ -107,6 +126,7 @@ function App() {
           }
         />
 
+        {/* Contact */}
         <Route
           path="/contact"
           element={
@@ -121,6 +141,7 @@ function App() {
           }
         />
 
+        {/* Exchange - Protected */}
         <Route
           path="/exchange"
           element={
@@ -137,6 +158,7 @@ function App() {
           }
         />
 
+        {/* Sale - Protected */}
         <Route
           path="/sale"
           element={
@@ -153,6 +175,7 @@ function App() {
           }
         />
 
+        {/* Donate - Protected */}
         <Route
           path="/donate"
           element={
@@ -168,6 +191,9 @@ function App() {
             </>
           }
         />
+
+        {/* Not Found */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

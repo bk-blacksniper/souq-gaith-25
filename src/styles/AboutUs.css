@@ -41,6 +41,9 @@
   padding: 10px 36px;
   font-size: 16px;
   cursor: pointer;
+  display: block;
+  text-decoration: none;
+  width: max-content;
 }
 
 /* الصورة */

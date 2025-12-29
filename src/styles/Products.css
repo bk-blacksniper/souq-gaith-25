@@ -132,3 +132,23 @@
 .product-card .btn {
   width: 90%;
 }
+
+
+/* Media Queries Products 2 */
+.products-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 992px) {
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .products-grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
