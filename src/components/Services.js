@@ -1,19 +1,19 @@
 import ServicesSection from "./Services2";
-import Products from "../pages/Products"; // ✅ عرض المنتجات اللي بتجيب من all_products
+import Products from "../pages/Products";
+import { useTranslation } from "react-i18next";
 
 const Services = () => {
+  const { t } = useTranslation();
+
   return (
     <main>
-      {/* قسم الخدمات الثابتة */}
       <ServicesSection />
 
-      {/* قسم المنتجات القادمة من Supabase */}
       <section>
         <div className="container">
-          <h2 className="mb-4 text-center">منتجاتنا</h2>
+          <h2 className="mb-4 text-center">{t("services.productsSectionTitle")}</h2>
         </div>
 
-        {/* ✅ هون العرض الحقيقي */}
         <Products mode="home" />
       </section>
     </main>

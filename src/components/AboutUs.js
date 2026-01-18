@@ -1,43 +1,32 @@
 import React from "react";
 import "../styles/AboutUs.css";
 import aboutImage from "../assets/images/about-image.png";
+import { useTranslation } from "react-i18next";
 
 const AboutUs = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="about-us container">
       <div className="about-image">
-        <img src={aboutImage} alt="About Us" />
+        <img src={aboutImage} alt={t("about.imageAlt")} />
       </div>
+
       <div className="about-content">
-        <h2 className="about-title">من نحن</h2>
-        <p className="about-text">
-          نحن في سوق الغيث نسعى لخلق مساحة تفاعلية تسهم في تحقيق التكافل
-          والتضامن المجتمعي، خصوصاً في أوقات التحديات. في سوق الغيث، نبني جسور
-          الدعم والتواصل، حيث يمكن لكل فرد أن يكون جزءاً من حل، وأن يقدم ما
-          يستطيع للآخرين بطرق متعددة. نؤمن أن الأشياء التي تمتلكها، مهما كانت
-          بسيطة، يمكن أن تكون لها قيمة كبيرة بالنسبة لشخص آخر. في الوقت نفسه، قد
-          تجد ما تبحث عنه لدى أشخاص آخرين هنا، مما يقلل من الاعتماد على الموارد
-          المالية ويعزز روح المشاركة والعطاء. نحن نقدم لك فرصة لتبادل، بيع، أو
-          التبرع بأشياءك الزائدة، مما يتيح لك الإسهام في دعم مجتمعك وتقوية
-          الروابط بين أفراده.
-        </p>
+        <h2 className="about-title">{t("about.title")}</h2>
+
+        <p className="about-text">{t("about.body")}</p>
+
         <ul className="about-list">
-          <li>
-            التبادل: حيث يمكنك مبادلة ما لديك بما تحتاجه، مما يحقق الاستفادة
-            المتبادلة دون الحاجة للنقود.
-          </li>
-          <li>
-            البيع: لتقديم ما لديك لمن يحتاجه بسعر رمزي يساعدك في الحصول على دخل،
-            ويخفف العبء عن المحتاجين.
-          </li>
-          <li>
-            التبرع: مساهمة منك لمن هم بأمس الحاجة للعون، مما يعكس روح العطاء
-            ويدعم تماسك المجتمع.
-          </li>
+          <li>{t("about.exchange")}</li>
+          <li>{t("about.sale")}</li>
+          <li>{t("about.donate")}</li>
         </ul>
-        معاً، نحقق التكافل ونصنع الأمل ونؤسس لمستقبل أفضل لنا جميعاً.
+
+        <p className="about-text">{t("about.closing")}</p>
+
         <a href="/about" className="about-button">
-          معرفة المزيد
+          {t("about.more")}
         </a>
       </div>
     </section>

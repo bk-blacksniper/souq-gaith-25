@@ -16,12 +16,16 @@ import MyRequests from "./pages/MyRequests";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./components/ScrollToTop";
+import LangDirection from "./components/LangDirection";
 
 function App() {
   const openLogin = () => window.dispatchEvent(new Event("open-login"));
 
   return (
     <Router>
+      <ScrollToTop />
+      <LangDirection />
       <Navbar />
       <Routes>
         {/* Home */}
@@ -47,10 +51,9 @@ function App() {
           element={
             <>
               <HeroSection2
-                heroName="خدماتنا"
-                heroBody="هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما سيلهي القارئ عن التركيز على الشكل الخارجي للنص"
+                heroNameKey="hero.servicesTitle"
+                heroBodyKey="hero.servicesSubtitle"
               />
-              {/* ✅ Services لحالها (بدون Services2 ولا Products) عشان ما يتكرر */}
               <Services />
               <FAQSection />
               <Footer />
@@ -63,7 +66,10 @@ function App() {
           path="/products"
           element={
             <>
-              <HeroSection2 heroName="منتجاتنا" heroBody="بيب" />
+              <HeroSection2
+                heroNameKey="hero.productsTitle"
+                heroBodyKey="hero.productsSubtitle"
+              />
               <Products mode="all" />
               <Footer />
             </>
@@ -75,7 +81,9 @@ function App() {
           path="/my-requests"
           element={
             <>
-              <HeroSection2 heroName="طلباتي" />
+              <HeroSection2
+                heroNameKey="hero.myRequestsTitle"
+              />
               <ProtectedRoute openLogin={openLogin}>
                 <MyRequests />
               </ProtectedRoute>
@@ -89,7 +97,9 @@ function App() {
           path="/settings"
           element={
             <>
-              <HeroSection2 heroName="الإعدادات" />
+              <HeroSection2
+                heroNameKey="hero.settingsTitle"
+              />
               <Settings />
             </>
           }
@@ -101,8 +111,8 @@ function App() {
           element={
             <>
               <HeroSection2
-                heroName="من نحن"
-                heroBody="أهلاً بكم في سوق الغيث، حيث يمكنكم تبادل أو بيع أو التبرع بما لديكم ومساعدة الآخرين في تلبية احتياجاتهم. معاً نصنع الأمل وندعم بعضنا البعض."
+                heroNameKey="hero.aboutTitle"
+                heroBodyKey="hero.aboutSubtitle"
               />
               <AboutUs />
               <FAQSection />
@@ -117,8 +127,8 @@ function App() {
           element={
             <>
               <HeroSection2
-                heroName="الاسئله الشائعه"
-                heroBody="الأسئلة المتكررة – حلول سريعة لاستفساراتك"
+                heroNameKey="hero.faqTitle"
+                heroBodyKey="hero.faqSubtitle"
               />
               <FAQSection />
               <Footer />
@@ -132,8 +142,8 @@ function App() {
           element={
             <>
               <HeroSection2
-                heroName="تواصل معنا"
-                heroBody="أهلاً بكم في سوق الغيث، حيث يمكنكم تبادل أو بيع أو التبرع بما لديكم ومساعدة الآخرين في تلبية احتياجاتهم. معاً نصنع الأمل وندعم بعضنا البعض."
+                heroNameKey="hero.contactTitle"
+                heroBodyKey="hero.contactSubtitle"
               />
               <ContactUs />
               <Footer />

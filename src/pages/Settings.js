@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function Settings() {
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
   const BUCKET = "product-images";
 
@@ -27,7 +30,7 @@ export default function Settings() {
   const [toast, setToast] = useState({ show: false, type: "success", message: "" });
   const showToast = (type, message) => {
     setToast({ show: true, type, message });
-    setTimeout(() => setToast((t) => ({ ...t, show: false })), 2600);
+    setTimeout(() => setToast((tt) => ({ ...tt, show: false })), 2600);
   };
 
   const toastClass = useMemo(() => {
@@ -71,7 +74,6 @@ export default function Settings() {
         .single();
 
       if (error) {
-        // لو ما في صف بالبروفايل، ما نوقف
         console.warn(error.message);
       } else {
         setFullName(profile?.full_name || "");
@@ -104,19 +106,19 @@ export default function Settings() {
     try {
       const { data } = await supabase.auth.getUser();
       const user = data.user;
-      if (!user) throw new Error("يجب تسجيل الدخول");
+      if (!user) throw new Error(t("settings.authRequired"));
 
       const ext = file.name.split(".").pop();
       const fileName = `${user.id}/${Date.now()}-${Math.random().toString(16).slice(2)}.${ext}`;
 
       const { error: upErr } = await supabase.storage.from(BUCKET).upload(fileName, file, {
-        upsert: false,
+        upsert: false
       });
       if (upErr) throw upErr;
 
       const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
       const url = pub?.publicUrl;
-      if (!url) throw new Error("فشل استخراج رابط الصورة");
+      if (!url) throw new Error(t("settings.avatarUrlFailed"));
 
       return url;
     } finally {
@@ -141,13 +143,10 @@ export default function Settings() {
       if (avatarFile) {
         const uploadedUrl = await uploadAvatarAndGetUrl(avatarFile);
 
-        // تحديث DB أولاً
         nextAvatarUrl = uploadedUrl;
 
-        // احذف الصورة القديمة بعد نجاح الرفع (اختياري)
         if (avatarUrl) await removeFromStorageIfPossible(avatarUrl);
 
-        // reset local file
         setAvatarFile(null);
         if (avatarPreview) {
           URL.revokeObjectURL(avatarPreview);
@@ -163,52 +162,46 @@ export default function Settings() {
       if (error) throw error;
 
       setAvatarUrl(nextAvatarUrl);
-      showToast("success", "تم حفظ بيانات الحساب ✅");
+      showToast("success", t("settings.savedOk"));
     } catch (e) {
       console.error(e);
-      showToast("error", e?.message || "فشل حفظ البيانات");
+      showToast("error", e?.message || t("settings.saveFailed"));
     } finally {
       setSaving(false);
     }
   };
 
   const changePassword = async () => {
-    // ملاحظة: Supabase لا يحتاج current password لتغييرها إذا المستخدم داخل،
-    // لكن نخليها واجهة اختيارية “لتأكيد”.
-    if (newPassword.length < 6) return showToast("error", "كلمة المرور يجب 6 أحرف على الأقل");
-    if (newPassword !== confirmPassword) return showToast("error", "كلمتا المرور غير متطابقتين");
+    if (newPassword.length < 6) return showToast("error", t("settings.pwdMin6"));
+    if (newPassword !== confirmPassword) return showToast("error", t("settings.pwdNotMatch"));
 
     setSaving(true);
     try {
-      // currentPassword فقط للواجهة (اختياري) — ما بنستخدمه API هنا
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
 
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      showToast("success", "تم تغيير كلمة المرور 🔐");
+      showToast("success", t("settings.pwdChanged"));
     } catch (e) {
       console.error(e);
-      showToast("error", e?.message || "فشل تغيير كلمة المرور");
+      showToast("error", e?.message || t("settings.pwdChangeFailed"));
     } finally {
       setSaving(false);
     }
   };
 
-  // ✅ حذف الحساب: الحل السهل (طلب حذف) + الحل الصحيح عبر Edge Function
   const deleteAccount = async () => {
-    const ok = window.confirm("⚠️ هل أنت متأكد؟ سيتم حذف الحساب نهائياً.");
+    const ok = window.confirm(t("settings.confirmDeleteAccount"));
     if (!ok) return;
 
-    // حل سريع: تسجيل خروج وإظهار رسالة (بدون حذف فعلي من auth.users)
-    // (الحذف الحقيقي يحتاج Edge Function أو Admin API)
     await supabase.auth.signOut();
-    showToast("success", "تم تسجيل الخروج. لتفعيل الحذف النهائي، نحتاج Edge Function.");
+    showToast("success", t("settings.logoutAfterDeleteNote"));
     navigate("/");
   };
 
-  if (loading) return <p className="text-center p-4">Loading...</p>;
+  if (loading) return <p className="text-center p-4">{t("common.loading")}</p>;
 
   return (
     <div className="container py-4" style={{ maxWidth: 650 }}>
@@ -221,12 +214,12 @@ export default function Settings() {
         )}
       </div>
 
-      <h3 className="mb-4 text-center">الإعدادات</h3>
+      <h3 className="mb-4 text-center">{t("settings.pageTitle")}</h3>
 
       {/* Profile Card */}
       <div className="card mb-3">
         <div className="card-body">
-          <h5 className="mb-3">بيانات الحساب</h5>
+          <h5 className="mb-3">{t("settings.accountData")}</h5>
 
           <div className="d-flex gap-3 align-items-start flex-wrap">
             <div style={{ width: 140 }}>
@@ -237,7 +230,7 @@ export default function Settings() {
                   borderRadius: "50%",
                   overflow: "hidden",
                   border: "1px solid #eee",
-                  background: "#f7f7f7",
+                  background: "#f7f7f7"
                 }}
               >
                 <img
@@ -255,12 +248,12 @@ export default function Settings() {
               />
 
               {uploadingAvatar && (
-                <small className="text-muted">جاري رفع الصورة...</small>
+                <small className="text-muted">{t("settings.uploadingAvatar")}</small>
               )}
             </div>
 
             <div style={{ flex: 1, minWidth: 240 }}>
-              <label className="form-label">الاسم الكامل</label>
+              <label className="form-label">{t("settings.fullName")}</label>
               <input
                 className="form-control mb-2"
                 value={fullName}
@@ -272,7 +265,7 @@ export default function Settings() {
                 onClick={saveProfile}
                 disabled={saving || uploadingAvatar}
               >
-                {saving ? "جارٍ الحفظ..." : "حفظ البيانات"}
+                {saving ? t("settings.saving") : t("settings.save")}
               </button>
             </div>
           </div>
@@ -282,9 +275,9 @@ export default function Settings() {
       {/* Password Card */}
       <div className="card mb-3">
         <div className="card-body">
-          <h5 className="mb-3">تغيير كلمة المرور</h5>
+          <h5 className="mb-3">{t("settings.changePasswordTitle")}</h5>
 
-          <label className="form-label">كلمة المرور الحالية (اختياري)</label>
+          <label className="form-label">{t("settings.currentPasswordOptional")}</label>
           <input
             type="password"
             className="form-control mb-2"
@@ -293,7 +286,7 @@ export default function Settings() {
             placeholder="********"
           />
 
-          <label className="form-label">كلمة المرور الجديدة</label>
+          <label className="form-label">{t("settings.newPassword")}</label>
           <input
             type="password"
             className="form-control mb-2"
@@ -302,7 +295,7 @@ export default function Settings() {
             placeholder="********"
           />
 
-          <label className="form-label">تأكيد كلمة المرور الجديدة</label>
+          <label className="form-label">{t("settings.confirmNewPassword")}</label>
           <input
             type="password"
             className="form-control mb-3"
@@ -311,8 +304,12 @@ export default function Settings() {
             placeholder="********"
           />
 
-          <button className="btn btn-outline-success w-100" onClick={changePassword} disabled={saving}>
-            {saving ? "جارٍ التغيير..." : "تغيير كلمة المرور"}
+          <button
+            className="btn btn-outline-success w-100"
+            onClick={changePassword}
+            disabled={saving}
+          >
+            {saving ? t("settings.changing") : t("settings.changePasswordBtn")}
           </button>
         </div>
       </div>
@@ -320,13 +317,13 @@ export default function Settings() {
       {/* Danger Zone */}
       <div className="card border-danger">
         <div className="card-body">
-          <h5 className="text-danger mb-2">منطقة خطرة</h5>
+          <h5 className="text-danger mb-2">{t("settings.dangerZone")}</h5>
           <p className="text-muted mb-3" style={{ fontSize: 14 }}>
-            حذف الحساب نهائيًا يحتاج تفعيل Edge Function (لأنه يتطلب صلاحيات Admin).
+            {t("settings.dangerNote")}
           </p>
 
           <button className="btn btn-danger w-100" onClick={deleteAccount}>
-            حذف الحساب
+            {t("settings.deleteAccount")}
           </button>
         </div>
       </div>

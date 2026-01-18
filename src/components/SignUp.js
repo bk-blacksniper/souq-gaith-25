@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import "../styles/LoginAlert.css";
-import { supabase } from "../lib/supabaseClient"; // تأكد من المسار
+import { supabase } from "../lib/supabaseClient";
+import { useTranslation } from "react-i18next";
 
 const SignUp = ({ toggleAlert, switchToLogin }) => {
+  const { t } = useTranslation();
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -23,7 +26,7 @@ const SignUp = ({ toggleAlert, switchToLogin }) => {
     setErrorMsg("");
 
     if (!agree) {
-      setErrorMsg("يجب الموافقة على الشروط والأحكام");
+      setErrorMsg(t("auth.mustAgree"));
       return;
     }
 
@@ -48,18 +51,14 @@ const SignUp = ({ toggleAlert, switchToLogin }) => {
       return;
     }
 
-    // نفس الشكل، فقط تنبيه بسيط
-    alert("تم إنشاء الحساب بنجاح ✅");
     switchToLogin();
   };
 
   return (
     <div className="alert-overlay" onClick={toggleAlert}>
       <div className="alert-box" onClick={(e) => e.stopPropagation()}>
-        <h2 className="alert-title">إنشاء حساب جديد</h2>
-        <p className="alert-description">
-          مرحباً بك! انضم إلينا الآن واستمتع بجميع خدماتنا المميزة عبر التسجيل
-        </p>
+        <h2 className="alert-title">{t("auth.signupTitle")}</h2>
+        <p className="alert-description">{t("auth.signupDesc")}</p>
 
         {errorMsg && (
           <p className="alert-description" style={{ color: "red" }}>
@@ -71,7 +70,7 @@ const SignUp = ({ toggleAlert, switchToLogin }) => {
           <div className="form-group">
             <input
               type="text"
-              placeholder="الاسم"
+              placeholder={t("auth.name")}
               className="form-control"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -82,7 +81,7 @@ const SignUp = ({ toggleAlert, switchToLogin }) => {
           <div className="form-group">
             <input
               type="email"
-              placeholder="البريد الإلكتروني"
+              placeholder={t("auth.email")}
               className="form-control"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -93,7 +92,7 @@ const SignUp = ({ toggleAlert, switchToLogin }) => {
           <div className="form-group">
             <input
               type="tel"
-              placeholder="رقم الجوال *"
+              placeholder={t("auth.phoneStar")}
               className="form-control"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -107,19 +106,20 @@ const SignUp = ({ toggleAlert, switchToLogin }) => {
               onChange={(e) => setCity(e.target.value)}
               required
             >
-              <option value="">مكان الإقامة (المحافظة)*</option>
-              <option value="رفح">رفح</option>
-              <option value="خانيونس">خانيونس</option>
-              <option value="غزة">غزة</option>
-              <option value="الوسطى">الوسطى</option>
-              <option value="الشمال">الشمال</option>
+              <option value="">{t("auth.city")}</option>
+
+              <option value="رفح">{t("cities.rafah")}</option>
+              <option value="خانيونس">{t("cities.khanYounis")}</option>
+              <option value="غزة">{t("cities.gaza")}</option>
+              <option value="الوسطى">{t("cities.middle")}</option>
+              <option value="الشمال">{t("cities.north")}</option>
             </select>
           </div>
 
           <div className="form-group password-field">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="كلمة المرور"
+              placeholder={t("auth.password")}
               className="form-control"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -140,17 +140,18 @@ const SignUp = ({ toggleAlert, switchToLogin }) => {
                 checked={agree}
                 onChange={(e) => setAgree(e.target.checked)}
               />{" "}
-              الموافقة على الشروط والأحكام
+              {t("auth.agreeTerms")}
             </label>
           </div>
 
           <button type="submit" className="btn btn-success" disabled={loading}>
-            {loading ? "جاري الإنشاء..." : "إنشاء الحساب"}
+            {loading ? t("auth.creating") : t("auth.signupBtn")}
           </button>
         </form>
 
         <p className="create-account">
-          لديك حساب؟ <span onClick={switchToLogin}>تسجيل الدخول</span>
+          {t("auth.haveAccount")}{" "}
+          <span onClick={switchToLogin}>{t("auth.loginBtn")}</span>
         </p>
 
         <button className="btn-close" onClick={toggleAlert}>

@@ -2,8 +2,11 @@ import React, { useRef, useState } from "react";
 import "../styles/FileUploader.css";
 import Image from "../assets/icon/Image.png";
 import { supabase } from "../lib/supabaseClient";
+import { useTranslation } from "react-i18next";
 
 function FileUploader({ onUpload }) {
+  const { t } = useTranslation();
+
   const [files, setFiles] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState("");
@@ -24,14 +27,14 @@ function FileUploader({ onUpload }) {
       setErr("");
 
       if (!files || files.length === 0) {
-        setErr("اختر صورة أولًا");
+        setErr(t("uploader.chooseFirst"));
         return;
       }
 
       const { data: uData, error: uErr } = await supabase.auth.getUser();
       if (uErr) throw uErr;
       if (!uData?.user) {
-        setErr("لازم تسجّل دخول قبل رفع الصور");
+        setErr(t("uploader.loginBeforeUpload"));
         return;
       }
 
@@ -50,9 +53,7 @@ function FileUploader({ onUpload }) {
 
         if (upErr) throw upErr;
 
-        const { data } = supabase.storage
-          .from("product-images")
-          .getPublicUrl(filePath);
+        const { data } = supabase.storage.from("product-images").getPublicUrl(filePath);
 
         uploadedUrls.push(data.publicUrl);
       }
@@ -64,7 +65,7 @@ function FileUploader({ onUpload }) {
     } catch (e) {
       console.error("UPLOAD ERROR:", e);
       setUploading(false);
-      setErr(e?.message || "حدث خطأ أثناء رفع الصور");
+      setErr(e?.message || t("uploader.uploadError"));
     }
   };
 
@@ -80,11 +81,15 @@ function FileUploader({ onUpload }) {
         {err && <p style={{ color: "red", margin: "8px 0" }}>{err}</p>}
 
         <div className="actions">
-          <button className="btnn" onClick={() => setFiles(null)} disabled={uploading}>
-            Cancel
+          <button
+            className="btnn"
+            onClick={() => setFiles(null)}
+            disabled={uploading}
+          >
+            {t("uploader.cancel")}
           </button>
           <button className="btnn" onClick={handleUpload} disabled={uploading}>
-            {uploading ? "Uploading..." : "Upload"}
+            {uploading ? t("uploader.uploading") : t("uploader.upload")}
           </button>
         </div>
       </div>
@@ -94,9 +99,9 @@ function FileUploader({ onUpload }) {
     <div>
       {!files && (
         <div className="dropzone" onDragOver={handleDragOver} onDrop={handleDrop}>
-          <img src={Image} alt="Upload Images" className="img-upload" />
-          <h3>قم برفع صورة هنا</h3>
-          <h3>أو</h3>
+          <img src={Image} alt={t("uploader.upload")} className="img-upload" />
+          <h3>{t("uploader.dropHere")}</h3>
+          <h3>{t("uploader.or")}</h3>
 
           {err && <p style={{ color: "red", margin: "8px 0" }}>{err}</p>}
 
@@ -112,7 +117,7 @@ function FileUploader({ onUpload }) {
           />
 
           <button className="btn-upload" onClick={() => inputRef.current.click()}>
-            تحديد صورة من هنا
+            {t("uploader.pickBtn")}
           </button>
         </div>
       )}

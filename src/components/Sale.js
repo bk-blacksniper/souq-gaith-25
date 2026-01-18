@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import FileUploader from "./FileUploader";
 import "../styles/Exchange.css";
 import { supabase } from "../lib/supabaseClient";
+import { useTranslation } from "react-i18next";
 
 const Sale = () => {
+  const { t } = useTranslation();
+
   const [images, setImages] = useState([]);
 
   const [productName, setProductName] = useState("");
@@ -25,12 +28,12 @@ const Sale = () => {
     const user = data.user;
 
     if (!user) {
-      setErrorMsg("يجب تسجيل الدخول لإرسال الطلب");
+      setErrorMsg(t("forms.saleNeedLogin"));
       return;
     }
 
     if (!productName || !price) {
-      setErrorMsg("يرجى تعبئة اسم المنتج والسعر");
+      setErrorMsg(t("forms.saleFillRequired"));
       return;
     }
 
@@ -46,8 +49,8 @@ const Sale = () => {
         images,
         contact_name: contactName,
         address,
-        phone,
-      },
+        phone
+      }
     ]);
 
     setLoading(false);
@@ -58,7 +61,7 @@ const Sale = () => {
       return;
     }
 
-    alert("تم إرسال طلب البيع بنجاح ✅");
+    alert(t("forms.saleSuccess"));
 
     // reset
     setProductName("");
@@ -74,14 +77,14 @@ const Sale = () => {
   return (
     <div className="container">
       <div className="box-3">
-        <h1>معلومات حول المنتج المراد بيعه</h1>
+        <h1>{t("forms.saleTitle")}</h1>
 
         <div className="file-upload">
           <FileUploader onUpload={(urls) => setImages(urls)} />
         </div>
 
         {images.length > 0 && (
-          <p style={{ color: "green" }}>تم رفع الصور بنجاح ✅</p>
+          <p style={{ color: "green" }}>{t("forms.imagesUploaded")}</p>
         )}
 
         {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
@@ -90,61 +93,65 @@ const Sale = () => {
           <input
             className="column"
             type="text"
-            placeholder="اسم المنتج"
+            placeholder={t("forms.saleProductName")}
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
           />
           <input
             className="column"
             type="text"
-            placeholder="وصف المنتج"
+            placeholder={t("forms.saleDescription")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
           <input
             className="column"
             type="text"
-            placeholder="القيمة التقديرية"
+            placeholder={t("forms.saleEstimated")}
             value={estimatedValue}
             onChange={(e) => setEstimatedValue(e.target.value)}
           />
           <input
             className="column"
             type="text"
-            placeholder="سعر المنتج"
+            placeholder={t("forms.salePrice")}
             value={price}
             onChange={(e) => setPrice(e.target.value)}
           />
         </div>
 
         <div className="contact-info">
-          <h1>معلومات التواصل</h1>
+          <h1>{t("forms.contactInfo")}</h1>
           <div className="info">
             <input
               className="column"
               type="text"
-              placeholder="الاسم"
+              placeholder={t("forms.name")}
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
             />
             <input
               className="column"
               type="text"
-              placeholder="العنوان"
+              placeholder={t("forms.address")}
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
             <input
               className="column"
               type="text"
-              placeholder="رقم الهاتف"
+              placeholder={t("forms.phone")}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
 
-          <button className="submit-send" onClick={handleSubmit} disabled={loading}>
-            {loading ? "جاري الإرسال..." : "إرسال الطلب"}
+          <button
+            className="submit-send"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? t("common.sending") : t("forms.submit")}
           </button>
         </div>
       </div>
