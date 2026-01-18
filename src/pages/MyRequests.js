@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { useTranslation } from "react-i18next";
 
 export default function MyRequests() {
+  const { t } = useTranslation();
+
   const BUCKET = "product-images";
 
   const [items, setItems] = useState([]);
@@ -14,7 +17,6 @@ export default function MyRequests() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // صور جديدة (متعددة)
   const [newFiles, setNewFiles] = useState([]); // File[]
   const [newPreviews, setNewPreviews] = useState([]); // string[]
 
@@ -24,20 +26,18 @@ export default function MyRequests() {
     price: "",
     desired_item: "",
     phone: "",
-    address: "",
+    address: ""
   });
 
   const getImages = (p) => (Array.isArray(p?.images) ? p.images : []);
 
   const badge = (type) => {
-    if (type === "sale") return "بيع";
-    if (type === "donate") return "تبرع";
-    if (type === "exchange") return "تبادل";
-    return "منتج";
+    if (type === "sale") return t("productsCard.sale");
+    if (type === "donate") return t("productsCard.donate");
+    if (type === "exchange") return t("productsCard.exchange");
+    return t("productsCard.product");
   };
 
-  // استخراج مسار الملف من publicUrl
-  // https://xxx.supabase.co/storage/v1/object/public/product-images/<PATH>
   const extractStoragePathFromPublicUrl = (publicUrl) => {
     if (!publicUrl) return null;
     const marker = `/storage/v1/object/public/${BUCKET}/`;
@@ -52,7 +52,6 @@ export default function MyRequests() {
 
     const { error } = await supabase.storage.from(BUCKET).remove([path]);
     if (error) {
-      // ما نوقف التطبيق بسبب فشل الحذف، بس بنحذّر
       console.warn("Storage remove failed:", error.message);
     }
   };
@@ -78,7 +77,7 @@ export default function MyRequests() {
 
     if (error) {
       console.error(error);
-      setErr(error.message || "فشل جلب طلباتك");
+      setErr(error.message || t("myRequests.fetchFailed"));
       setItems([]);
     } else {
       setItems(Array.isArray(data) ? data : []);
@@ -89,6 +88,7 @@ export default function MyRequests() {
 
   useEffect(() => {
     loadMyRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const openEdit = (item) => {
@@ -99,10 +99,9 @@ export default function MyRequests() {
       price: item.price ?? "",
       desired_item: item.desired_item || "",
       phone: item.phone || "",
-      address: item.address || "",
+      address: item.address || ""
     });
 
-    // reset new images
     newPreviews.forEach((u) => URL.revokeObjectURL(u));
     setNewFiles([]);
     setNewPreviews([]);
@@ -121,13 +120,10 @@ export default function MyRequests() {
     setErr("");
   };
 
-  // =========================
-  // Upload images (multiple)
-  // =========================
   const uploadManyAndGetUrls = async (files) => {
     const { data: u } = await supabase.auth.getUser();
     const user = u?.user;
-    if (!user) throw new Error("يجب تسجيل الدخول");
+    if (!user) throw new Error(t("settings.authRequired"));
 
     setUploading(true);
     try {
@@ -147,7 +143,7 @@ export default function MyRequests() {
 
         const { data } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
         const url = data?.publicUrl;
-        if (!url) throw new Error("فشل استخراج رابط الصورة");
+        if (!url) throw new Error(t("settings.avatarUrlFailed"));
 
         urls.push(url);
       }
@@ -158,9 +154,6 @@ export default function MyRequests() {
     }
   };
 
-  // =========================
-  // DB update/delete helpers
-  // =========================
   const updateInCorrectTable = async (item, payload, nextImages) => {
     const realId = item.id;
 
@@ -173,7 +166,7 @@ export default function MyRequests() {
           price: payload.price,
           phone: payload.phone,
           address: payload.address,
-          images: nextImages,
+          images: nextImages
         })
         .eq("id", realId);
     }
@@ -186,7 +179,7 @@ export default function MyRequests() {
           item_description: payload.description,
           phone: payload.phone,
           address: payload.address,
-          images: nextImages,
+          images: nextImages
         })
         .eq("id", realId);
     }
@@ -200,19 +193,17 @@ export default function MyRequests() {
           desired_item: payload.desired_item,
           phone: payload.phone,
           address: payload.address,
-          images: nextImages,
+          images: nextImages
         })
         .eq("id", realId);
     }
 
-    // لو عندك products
     return supabase
       .from("products")
       .update({
         name: payload.name,
         description: payload.description,
-        price: payload.price,
-        // images: nextImages, // فعّلها إذا جدول products فيه images
+        price: payload.price
       })
       .eq("id", realId);
   };
@@ -227,14 +218,10 @@ export default function MyRequests() {
     return supabase.from("products").delete().eq("id", realId);
   };
 
-  // =========================
-  // UI actions
-  // =========================
   const onPickNewImages = (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
-    // تنظيف previews القديمة
     newPreviews.forEach((u) => URL.revokeObjectURL(u));
 
     setNewFiles(files);
@@ -250,10 +237,9 @@ export default function MyRequests() {
     price:
       form.price === "" || form.price === null || form.price === undefined
         ? null
-        : Number(form.price),
+        : Number(form.price)
   });
 
-  // ⭐ جعل صورة رئيسية
   const makePrimary = async (index) => {
     if (!editing) return;
     const imgs = getImages(editing);
@@ -273,13 +259,12 @@ export default function MyRequests() {
       await loadMyRequests();
     } catch (e) {
       console.error(e);
-      setErr(e?.message || "فشل تعيين الصورة الرئيسية");
+      setErr(e?.message || t("myRequests.setPrimaryFailed"));
     } finally {
       setSaving(false);
     }
   };
 
-  // 🗑 حذف صورة من المعرض (DB + Storage)
   const deleteImageAt = async (index) => {
     if (!editing) return;
     const imgs = getImages(editing);
@@ -293,20 +278,18 @@ export default function MyRequests() {
       const { error } = await updateInCorrectTable(editing, payload, next);
       if (error) throw error;
 
-      // حذف من التخزين (محاولة)
       await removeFromStorageIfPossible(target);
 
       setEditing((prev) => ({ ...prev, images: next }));
       await loadMyRequests();
     } catch (e) {
       console.error(e);
-      setErr(e?.message || "فشل حذف الصورة");
+      setErr(e?.message || t("myRequests.imageDeleteFailed"));
     } finally {
       setSaving(false);
     }
   };
 
-  // حفظ + إضافة صور (بدون حذف القديم)
   const saveAddImages = async () => {
     if (!editing) return;
 
@@ -328,18 +311,17 @@ export default function MyRequests() {
       await loadMyRequests();
     } catch (e) {
       console.error(e);
-      setErr(e?.message || "فشل الحفظ");
+      setErr(e?.message || t("myRequests.saveFailed"));
     } finally {
       setSaving(false);
     }
   };
 
-  // استبدال الرئيسية + حذف القديمة
   const saveReplacePrimary = async () => {
     if (!editing) return;
 
     if (!newFiles.length) {
-      setErr("اختر صورة جديدة أولاً لاستبدال الرئيسية.");
+      setErr(t("myRequests.needPickNewImage"));
       return;
     }
 
@@ -352,7 +334,6 @@ export default function MyRequests() {
 
       const uploadedUrls = await uploadManyAndGetUrls(newFiles);
 
-      // اجعل أول uploaded هو الرئيسي، ثم باقي الصور الجديدة، ثم بقية القديمة بدون الأولى
       let nextImages = [uploadedUrls[0], ...oldImages.slice(1)];
       if (uploadedUrls.length > 1) {
         nextImages = [uploadedUrls[0], ...uploadedUrls.slice(1), ...oldImages.slice(1)];
@@ -361,23 +342,21 @@ export default function MyRequests() {
       const { error } = await updateInCorrectTable(editing, payload, nextImages);
       if (error) throw error;
 
-      // حذف القديمة الرئيسية من Storage
       if (oldPrimary) await removeFromStorageIfPossible(oldPrimary);
 
       closeEdit();
       await loadMyRequests();
     } catch (e) {
       console.error(e);
-      setErr(e?.message || "فشل استبدال الصورة الرئيسية");
+      setErr(e?.message || t("myRequests.replaceFailed"));
     } finally {
       setSaving(false);
     }
   };
 
-  // حذف الطلب بالكامل + حذف كل الصور
   const deleteRequest = async () => {
     if (!editing) return;
-    const ok = window.confirm("متأكد بدك تحذف الطلب نهائيًا؟");
+    const ok = window.confirm(t("myRequests.confirmDeleteRequest"));
     if (!ok) return;
 
     setSaving(true);
@@ -385,11 +364,9 @@ export default function MyRequests() {
     try {
       const imgs = getImages(editing);
 
-      // 1) حذف الصف
       const { error: delErr } = await deleteFromCorrectTable(editing);
       if (delErr) throw delErr;
 
-      // 2) حذف الصور من Storage (محاولة)
       for (const url of imgs) {
         await removeFromStorageIfPossible(url);
       }
@@ -398,25 +375,22 @@ export default function MyRequests() {
       await loadMyRequests();
     } catch (e) {
       console.error(e);
-      setErr(e?.message || "فشل حذف الطلب");
+      setErr(e?.message || t("myRequests.deleteFailed"));
     } finally {
       setSaving(false);
     }
   };
 
-  // =========================
-  // Render
-  // =========================
-  if (loading) return <p className="text-center p-4">Loading...</p>;
+  if (loading) return <p className="text-center p-4">{t("common.loading")}</p>;
 
   return (
     <div className="container py-4">
-      <h3 className="mb-3">طلباتي</h3>
+      <h3 className="mb-3">{t("nav.myRequests")}</h3>
 
       {err && !editOpen && <p className="text-danger">{err}</p>}
 
       {items.length === 0 ? (
-        <p className="text-muted">لا يوجد طلبات.</p>
+        <p className="text-muted">{t("requests.noRequests")}</p>
       ) : (
         <div className="row g-3">
           {items.map((it) => {
@@ -446,7 +420,7 @@ export default function MyRequests() {
                         className="btn btn-sm btn-outline-success"
                         onClick={() => openEdit(it)}
                       >
-                        تعديل
+                        {t("common.edit")}
                       </button>
                     </div>
 
@@ -462,7 +436,7 @@ export default function MyRequests() {
 
                     {imgs.length > 1 && (
                       <p className="text-muted mt-2 mb-0" style={{ fontSize: 12 }}>
-                        صور: {imgs.length}
+                        {t("myRequests.imagesCountLabel", { count: imgs.length })}
                       </p>
                     )}
                   </div>
@@ -483,21 +457,20 @@ export default function MyRequests() {
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">تعديل الطلب</h5>
+                <h5 className="modal-title">{t("myRequests.editTitle")}</h5>
                 <button className="btn-close" onClick={closeEdit}></button>
               </div>
 
               <div className="modal-body">
-                {/* معرض الصور */}
                 <div className="mb-3">
                   <div className="d-flex justify-content-between align-items-center">
-                    <label className="form-label m-0">معرض الصور</label>
-                    <small className="text-muted">الصورة الأولى هي الرئيسية</small>
+                    <label className="form-label m-0">{t("myRequests.galleryTitle")}</label>
+                    <small className="text-muted">{t("myRequests.firstIsPrimary")}</small>
                   </div>
 
                   <div className="d-flex flex-wrap gap-2 mt-2">
                     {getImages(editing).length === 0 && (
-                      <div className="text-muted">لا يوجد صور</div>
+                      <div className="text-muted">{t("ads.noAds")}</div>
                     )}
 
                     {getImages(editing).map((url, idx) => (
@@ -509,7 +482,7 @@ export default function MyRequests() {
                           borderRadius: 8,
                           overflow: "hidden",
                           position: "relative",
-                          background: "#fff",
+                          background: "#fff"
                         }}
                       >
                         <img
@@ -528,10 +501,10 @@ export default function MyRequests() {
                               color: "#fff",
                               fontSize: 11,
                               padding: "2px 6px",
-                              borderRadius: 6,
+                              borderRadius: 6
                             }}
                           >
-                            رئيسية
+                            {t("myRequests.primaryBadge")}
                           </span>
                         )}
 
@@ -540,7 +513,7 @@ export default function MyRequests() {
                             className="btn btn-sm btn-outline-success"
                             onClick={() => makePrimary(idx)}
                             disabled={saving}
-                            title="اجعلها رئيسية"
+                            title={t("myRequests.makePrimary")}
                           >
                             ⭐
                           </button>
@@ -549,7 +522,7 @@ export default function MyRequests() {
                             className="btn btn-sm btn-outline-danger"
                             onClick={() => deleteImageAt(idx)}
                             disabled={saving}
-                            title="حذف"
+                            title={t("common.delete")}
                           >
                             🗑
                           </button>
@@ -559,9 +532,8 @@ export default function MyRequests() {
                   </div>
                 </div>
 
-                {/* إضافة صور جديدة */}
                 <div className="mb-3">
-                  <label className="form-label">إضافة صور جديدة (متعددة)</label>
+                  <label className="form-label">{t("myRequests.addNewImages")}</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -582,26 +554,26 @@ export default function MyRequests() {
                             height: 90,
                             objectFit: "cover",
                             borderRadius: 8,
-                            border: "1px solid #eee",
+                            border: "1px solid #eee"
                           }}
                         />
                       ))}
                     </div>
                   )}
 
-                  {uploading && <small className="text-muted">جاري رفع الصور...</small>}
+                  {uploading && <small className="text-muted">{t("myRequests.uploadingImages")}</small>}
                 </div>
 
                 <hr />
 
-                <label className="form-label">الاسم</label>
+                <label className="form-label">{t("forms.name")}</label>
                 <input
                   className="form-control mb-2"
                   value={form.name}
                   onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                 />
 
-                <label className="form-label">الوصف</label>
+                <label className="form-label">{t("createAd.description")}</label>
                 <textarea
                   className="form-control mb-2"
                   rows={3}
@@ -611,7 +583,7 @@ export default function MyRequests() {
 
                 {editing.type === "sale" && (
                   <>
-                    <label className="form-label">السعر</label>
+                    <label className="form-label">{t("ads.price")}</label>
                     <input
                       type="number"
                       className="form-control mb-2"
@@ -623,7 +595,7 @@ export default function MyRequests() {
 
                 {editing.type === "exchange" && (
                   <>
-                    <label className="form-label">المطلوب مقابل</label>
+                    <label className="form-label">{t("myRequests.desiredItemLabel")}</label>
                     <input
                       className="form-control mb-2"
                       value={form.desired_item}
@@ -634,14 +606,14 @@ export default function MyRequests() {
                   </>
                 )}
 
-                <label className="form-label">رقم الهاتف</label>
+                <label className="form-label">{t("forms.phone")}</label>
                 <input
                   className="form-control mb-2"
                   value={form.phone}
                   onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
                 />
 
-                <label className="form-label">العنوان</label>
+                <label className="form-label">{t("forms.address")}</label>
                 <input
                   className="form-control"
                   value={form.address}
@@ -652,37 +624,34 @@ export default function MyRequests() {
               </div>
 
               <div className="modal-footer d-flex gap-2">
-                {/* حذف الطلب بالكامل */}
                 <button
                   className="btn btn-danger me-auto"
                   onClick={deleteRequest}
                   disabled={saving || uploading}
-                  title="سيتم حذف الطلب وكل صوره"
+                  title={t("myRequests.deleteWillRemoveImages")}
                 >
-                  {saving ? "جارٍ الحذف..." : "حذف الطلب"}
+                  {saving ? t("myRequests.deleting") : t("myRequests.deleteRequest")}
                 </button>
 
                 <button className="btn btn-secondary" onClick={closeEdit} disabled={saving}>
-                  إلغاء
+                  {t("common.cancel")}
                 </button>
 
-                {/* حفظ مع إضافة الصور الجديدة */}
                 <button
                   className="btn btn-outline-success"
                   onClick={saveAddImages}
                   disabled={saving || uploading}
                 >
-                  {saving ? "جارٍ الحفظ..." : "حفظ + إضافة الصور"}
+                  {saving ? t("settings.saving") : t("myRequests.saveAndAddImages")}
                 </button>
 
-                {/* استبدال الصورة الرئيسية مع حذف القديمة */}
                 <button
                   className="btn btn-success"
                   onClick={saveReplacePrimary}
                   disabled={saving || uploading}
-                  title="سيستبدل الرئيسية ويحذف القديمة من التخزين"
+                  title={t("myRequests.replaceInfo")}
                 >
-                  {saving ? "جارٍ الحفظ..." : "استبدال الرئيسية"}
+                  {saving ? t("settings.saving") : t("myRequests.replacePrimary")}
                 </button>
               </div>
             </div>

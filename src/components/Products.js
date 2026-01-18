@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import Products2 from "../components/Products2";
+import { useTranslation } from "react-i18next";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -28,7 +30,7 @@ export default function Products() {
   }, []);
 
   if (loading) {
-    return <p style={{ padding: 20, textAlign: "center" }}>Loading...</p>;
+    return <p style={{ padding: 20, textAlign: "center" }}>{t("common.loading")}</p>;
   }
 
   return (

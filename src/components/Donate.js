@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import FileUploader from "./FileUploader";
 import "../styles/Exchange.css";
 import { supabase } from "../lib/supabaseClient";
+import { useTranslation } from "react-i18next";
 
 const Donate = () => {
+  const { t } = useTranslation();
+
   const [images, setImages] = useState([]);
 
   const [itemName, setItemName] = useState("");
@@ -23,12 +26,12 @@ const Donate = () => {
     const user = data.user;
 
     if (!user) {
-      setErrorMsg("يجب تسجيل الدخول لإرسال الطلب");
+      setErrorMsg(t("forms.donateNeedLogin"));
       return;
     }
 
     if (!itemName) {
-      setErrorMsg("يرجى تعبئة اسم العنصر المتبرّع به");
+      setErrorMsg(t("forms.donateFillRequired"));
       return;
     }
 
@@ -38,12 +41,12 @@ const Donate = () => {
       {
         user_id: user.id,
         item_name: itemName,
-        item_description: description,
+        description,
         images,
         contact_name: contactName,
         address,
-        phone,
-      },
+        phone
+      }
     ]);
 
     setLoading(false);
@@ -54,7 +57,7 @@ const Donate = () => {
       return;
     }
 
-    alert("تم إرسال طلب التبرّع بنجاح ✅");
+    alert(t("forms.donateSuccess"));
 
     // reset
     setItemName("");
@@ -68,14 +71,14 @@ const Donate = () => {
   return (
     <div className="container">
       <div className="box-3">
-        <h1>معلومات حول العنصر المتبرّع به</h1>
+        <h1>{t("forms.donateTitle")}</h1>
 
         <div className="file-upload">
           <FileUploader onUpload={(urls) => setImages(urls)} />
         </div>
 
         {images.length > 0 && (
-          <p style={{ color: "green" }}>تم رفع الصور بنجاح ✅</p>
+          <p style={{ color: "green" }}>{t("forms.imagesUploaded")}</p>
         )}
 
         {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
@@ -84,47 +87,51 @@ const Donate = () => {
           <input
             className="column"
             type="text"
-            placeholder="اسم العنصر"
+            placeholder={t("forms.donateItemName")}
             value={itemName}
             onChange={(e) => setItemName(e.target.value)}
           />
           <input
             className="column"
             type="text"
-            placeholder="وصف العنصر"
+            placeholder={t("forms.donateDesc")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
 
         <div className="contact-info">
-          <h1>معلومات التواصل</h1>
+          <h1>{t("forms.contactInfo")}</h1>
           <div className="info">
             <input
               className="column"
               type="text"
-              placeholder="الاسم"
+              placeholder={t("forms.name")}
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
             />
             <input
               className="column"
               type="text"
-              placeholder="العنوان"
+              placeholder={t("forms.address")}
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
             <input
               className="column"
               type="text"
-              placeholder="رقم الهاتف"
+              placeholder={t("forms.phone")}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
 
-          <button className="submit-send" onClick={handleSubmit} disabled={loading}>
-            {loading ? "جاري الإرسال..." : "إرسال الطلب"}
+          <button
+            className="submit-send"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? t("common.sending") : t("forms.submit")}
           </button>
         </div>
       </div>
