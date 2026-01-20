@@ -180,7 +180,10 @@ const Navbar = () => {
                 <div className="d-flex flex-column flex-lg-row gap-2 w-100">
                   <button
                     className="btn btn-success w-100"
-                    onClick={toggleAlert}
+                    onClick={() => {
+                      toggleAlert();
+                      closeMobileMenu();
+                    }}
                   >
                     {t("nav.login")}
                   </button>
@@ -189,6 +192,7 @@ const Navbar = () => {
                     onClick={() => {
                       setIsSignUp(true);
                       setShowAlert(true);
+                      closeMobileMenu();
                     }}
                   >
                     {t("nav.signup")}
@@ -262,8 +266,11 @@ const Navbar = () => {
                       </li>
                     </ul>
                   </div>
-
-                  <LanguageSwitcher className="ms-2" onToggle={closeMobileMenu} />                </>
+                  <LanguageSwitcher
+                    className="ms-2"
+                    onToggle={closeMobileMenu}
+                  />{" "}
+                </>
               )}
             </div>
           </div>
