@@ -53,6 +53,7 @@
     "loadingCheck": "Checking...",
     "sending": "Sending...",
     "end": "You reached the end ✅",
+    "noProducts": "No Products",
 
     "yes": "Yes",
     "no": "No",
@@ -255,9 +256,11 @@
     "pwdNotMatch": "Passwords do not match",
     "pwdChanged": "Password changed 🔐",
     "pwdChangeFailed": "Failed to change password",
+    "currentPasswordRequired": "Please enter your current password",
+    "currentPasswordWrong": "Current password is incorrect",
+    "deletedOk": "Account deleted permanently ✅",
+    "deleteFailed": "Failed to delete account",
 
-    "dangerZone": "Danger zone",
-    "dangerNote": "Permanent account deletion requires enabling an Edge Function (Admin privileges).",
     "deleteAccount": "Delete account",
     "confirmDeleteAccount": "⚠️ Are you sure? Your account will be permanently deleted.",
     "logoutAfterDeleteNote": "Logged out. To enable permanent deletion, we need an Edge Function.",

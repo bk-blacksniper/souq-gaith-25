@@ -5,29 +5,33 @@ import { useTranslation } from "react-i18next";
 
 export default function Settings() {
   const { t } = useTranslation();
-
   const navigate = useNavigate();
+
   const BUCKET = "product-images";
+  const FUNCTION_URL = `${
+    process.env.REACT_APP_SUPABASE_URL || ""
+  }/functions/v1/delete-account`;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // profile
   const [fullName, setFullName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
 
-  // avatar upload
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
-  // password
-  const [currentPassword, setCurrentPassword] = useState(""); // اختياري
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // toast
-  const [toast, setToast] = useState({ show: false, type: "success", message: "" });
+  const [toast, setToast] = useState({
+    show: false,
+    type: "success",
+    message: "",
+  });
+
   const showToast = (type, message) => {
     setToast({ show: true, type, message });
     setTimeout(() => setToast((tt) => ({ ...tt, show: false })), 2600);
@@ -39,7 +43,6 @@ export default function Settings() {
     return "bg-dark text-white";
   }, [toast.type]);
 
-  // helper: extract path from public url
   const extractStoragePathFromPublicUrl = (publicUrl) => {
     if (!publicUrl) return null;
     const marker = `/storage/v1/object/public/${BUCKET}/`;
@@ -55,7 +58,6 @@ export default function Settings() {
     if (error) console.warn("Avatar remove failed:", error.message);
   };
 
-  // حماية الصفحة + تحميل profile
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase.auth.getUser();
@@ -88,8 +90,7 @@ export default function Settings() {
     return () => {
       if (avatarPreview) URL.revokeObjectURL(avatarPreview);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [avatarPreview, navigate]);
 
   const onPickAvatar = (e) => {
     const file = e.target.files?.[0];
@@ -111,12 +112,16 @@ export default function Settings() {
       const ext = file.name.split(".").pop();
       const fileName = `${user.id}/${Date.now()}-${Math.random().toString(16).slice(2)}.${ext}`;
 
-      const { error: upErr } = await supabase.storage.from(BUCKET).upload(fileName, file, {
-        upsert: false
-      });
+      const { error: upErr } = await supabase.storage
+        .from(BUCKET)
+        .upload(fileName, file, {
+          upsert: false,
+        });
       if (upErr) throw upErr;
 
-      const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(fileName);
+      const { data: pub } = supabase.storage
+        .from(BUCKET)
+        .getPublicUrl(fileName);
       const url = pub?.publicUrl;
       if (!url) throw new Error(t("settings.avatarUrlFailed"));
 
@@ -139,7 +144,6 @@ export default function Settings() {
 
       let nextAvatarUrl = avatarUrl;
 
-      // لو اختار صورة جديدة: ارفعها + احذف القديمة
       if (avatarFile) {
         const uploadedUrl = await uploadAvatarAndGetUrl(avatarFile);
 
@@ -162,6 +166,7 @@ export default function Settings() {
       if (error) throw error;
 
       setAvatarUrl(nextAvatarUrl);
+      window.dispatchEvent(new Event("profile-updated"));
       showToast("success", t("settings.savedOk"));
     } catch (e) {
       console.error(e);
@@ -172,12 +177,45 @@ export default function Settings() {
   };
 
   const changePassword = async () => {
-    if (newPassword.length < 6) return showToast("error", t("settings.pwdMin6"));
-    if (newPassword !== confirmPassword) return showToast("error", t("settings.pwdNotMatch"));
+    if (!currentPassword) {
+      showToast(
+        "error",
+        t("settings.currentPasswordRequired") || "Current password is required",
+      );
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      showToast("error", t("settings.pwdMin6"));
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showToast("error", t("settings.pwdNotMatch"));
+      return;
+    }
 
     setSaving(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
+      if (!user?.email) throw new Error(t("settings.authRequired"));
+
+      const { error: reauthErr } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+      if (reauthErr) {
+        showToast(
+          "error",
+          t("settings.currentPasswordWrong") || reauthErr.message,
+        );
+        return;
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
       if (error) throw error;
 
       setCurrentPassword("");
@@ -196,17 +234,60 @@ export default function Settings() {
     const ok = window.confirm(t("settings.confirmDeleteAccount"));
     if (!ok) return;
 
-    await supabase.auth.signOut();
-    showToast("success", t("settings.logoutAfterDeleteNote"));
-    navigate("/");
+    setSaving(true);
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error || !session?.access_token) {
+        showToast("error", t("settings.authRequired"));
+        return;
+      }
+
+      const res = await fetch(
+        "https://mnobcmagqhlzgitjhwby.supabase.co/functions/v1/delete-account",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        showToast("error", json?.error || t("settings.deleteFailed"));
+        return;
+      }
+
+      await supabase.auth.signOut();
+      showToast("success", t("settings.deletedOk"));
+      navigate("/");
+    } catch (e) {
+      console.error(e);
+      showToast("error", t("settings.deleteFailed"));
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <p className="text-center p-4">{t("common.loading")}</p>;
 
   return (
     <div className="container py-4" style={{ maxWidth: 650 }}>
-      {/* Toast */}
-      <div style={{ position: "fixed", top: 90, right: 16, zIndex: 9999, minWidth: 260 }}>
+      <div
+        style={{
+          position: "fixed",
+          top: 90,
+          right: 16,
+          zIndex: 9999,
+          minWidth: 260,
+        }}
+      >
         {toast.show && (
           <div className={`toast show ${toastClass}`} role="alert">
             <div className="toast-body">{toast.message}</div>
@@ -216,7 +297,6 @@ export default function Settings() {
 
       <h3 className="mb-4 text-center">{t("settings.pageTitle")}</h3>
 
-      {/* Profile Card */}
       <div className="card mb-3">
         <div className="card-body">
           <h5 className="mb-3">{t("settings.accountData")}</h5>
@@ -230,11 +310,15 @@ export default function Settings() {
                   borderRadius: "50%",
                   overflow: "hidden",
                   border: "1px solid #eee",
-                  background: "#f7f7f7"
+                  background: "#f7f7f7",
                 }}
               >
                 <img
-                  src={avatarPreview || avatarUrl || "https://via.placeholder.com/120?text=Avatar"}
+                  src={
+                    avatarPreview ||
+                    avatarUrl ||
+                    "https://via.placeholder.com/120?text=Avatar"
+                  }
                   alt="avatar"
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
@@ -248,7 +332,9 @@ export default function Settings() {
               />
 
               {uploadingAvatar && (
-                <small className="text-muted">{t("settings.uploadingAvatar")}</small>
+                <small className="text-muted">
+                  {t("settings.uploadingAvatar")}
+                </small>
               )}
             </div>
 
@@ -272,12 +358,13 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Password Card */}
       <div className="card mb-3">
         <div className="card-body">
           <h5 className="mb-3">{t("settings.changePasswordTitle")}</h5>
 
-          <label className="form-label">{t("settings.currentPasswordOptional")}</label>
+          <label className="form-label">
+            {t("settings.currentPasswordOptional")}
+          </label>
           <input
             type="password"
             className="form-control mb-2"
@@ -295,7 +382,9 @@ export default function Settings() {
             placeholder="********"
           />
 
-          <label className="form-label">{t("settings.confirmNewPassword")}</label>
+          <label className="form-label">
+            {t("settings.confirmNewPassword")}
+          </label>
           <input
             type="password"
             className="form-control mb-3"
@@ -314,15 +403,13 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Danger Zone */}
       <div className="card border-danger">
         <div className="card-body">
-          <h5 className="text-danger mb-2">{t("settings.dangerZone")}</h5>
-          <p className="text-muted mb-3" style={{ fontSize: 14 }}>
-            {t("settings.dangerNote")}
-          </p>
-
-          <button className="btn btn-danger w-100" onClick={deleteAccount}>
+          <button
+            className="btn btn-danger w-100"
+            onClick={deleteAccount}
+            disabled={saving}
+          >
             {t("settings.deleteAccount")}
           </button>
         </div>

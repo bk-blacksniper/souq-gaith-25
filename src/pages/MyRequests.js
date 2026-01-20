@@ -390,7 +390,7 @@ export default function MyRequests() {
       {err && !editOpen && <p className="text-danger">{err}</p>}
 
       {items.length === 0 ? (
-        <p className="text-muted">{t("requests.noRequests")}</p>
+        <p className="text-muted">{t("common.noProducts")}</p>
       ) : (
         <div className="row g-3">
           {items.map((it) => {
